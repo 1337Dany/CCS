@@ -27,7 +27,7 @@ public class View implements ConsoleView {
 
     @Override
     public void statisticsReprot(String str) {
-        System.out.println("Statistics: " + str);
+        System.out.println(str);
     }
 
 

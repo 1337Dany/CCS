@@ -82,14 +82,14 @@ public class Data {
     }
 
     public String getData(){
-        return "The number of newly connected clients: " + connectedClients + "\n" +
-                "The number of computed requests: " + computedRequests + "\n" +
+        return "The number of newly connected clients:              " + connectedClients + "\n" +
+                "The number of computed requests:                   " + computedRequests + "\n" +
                 "The numbers of particular requested operations: " + "\n" +
-                "Add operations: " + addOperations + "\n" +
-                "Sub operations: " + subOperations + "\n" +
-                "Mul operations: " + mulOperations + "\n" +
-                "Div operations: " + divOperations + "\n" +
-                "The number of incorrect operations: " + incorrectOperations + "\n" +
-                "The sum of computed values: " + sumOfResults;
+                "Add operations:                                    " + addOperations + "\n" +
+                "Sub operations:                                    " + subOperations + "\n" +
+                "Mul operations:                                    " + mulOperations + "\n" +
+                "Div operations:                                    " + divOperations + "\n" +
+                "The number of incorrect operations:                " + incorrectOperations + "\n" +
+                "The sum of computed values:                        " + sumOfResults;
     }
 }
