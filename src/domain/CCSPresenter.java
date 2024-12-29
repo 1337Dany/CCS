@@ -15,7 +15,6 @@ public class CCSPresenter implements ServerCallback {
         Server server = new Server(port, this);
     }
 
-
     @Override
     public void onConnectionMessage(String message) {
         consoleView.printErrorMessage(message);

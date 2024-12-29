@@ -1,6 +1,5 @@
 package data;
 
-import domain.ClientManager;
 import domain.ServerCallback;
 
 import java.io.IOException;
@@ -11,7 +10,7 @@ import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Server {
+public class Server implements ClientManagerCallback {
     private static final Data data = new Data();
     private final ServerCallback callback;
     private final int port;
@@ -40,17 +39,23 @@ public class Server {
                 String received = new String(packet.getData(), 0, packet.getLength());
 
                 if (received.startsWith("CCS DISCOVER")) {
-                    executorSevice.execute(new ClientManager());
+                    data.incrementConnectedClients();
                     String acceptMessage = "CCS FOUND";
-                    InetAddress localHost = InetAddress.getByName("localhost");
-                    DatagramPacket acceptPacket = new DatagramPacket(acceptMessage.getBytes(), acceptMessage.length(), localHost, port);
+                    InetAddress address = packet.getAddress();
+                    DatagramPacket acceptPacket = new DatagramPacket(
+                            acceptMessage.getBytes(),
+                            acceptMessage.length(),
+                            address,
+                            port
+                    );
                     datagramSocket.send(acceptPacket);
+                    executorSevice.execute(new ClientManager(packet.getAddress().getHostAddress(), port, this));
                 } else {
                     callback.onConnectionError("Incorrect input " + received);
                 }
             }
         } catch (IOException | NullPointerException e) {
-            callback.onConnectionError("Incorrect input");
+            e.printStackTrace();
         }
     }
 
@@ -65,5 +70,50 @@ public class Server {
                 }
             }
         });
+    }
+
+    @Override
+    public void onReceivedMessage(String message) {
+        callback.onConnectionMessage(message);
+    }
+
+    @Override
+    public void decrementConnectedClients() {
+        data.decrementConnectedClients();
+    }
+
+    @Override
+    public void incrementComputedRequests() {
+        data.incrementComputedRequests();
+    }
+
+    @Override
+    public void incrementAddOperations() {
+        data.incrementAddOperations();
+    }
+
+    @Override
+    public void incrementSubOperations() {
+        data.incrementSubOperations();
+    }
+
+    @Override
+    public void incrementMulOperations() {
+        data.incrementMulOperations();
+    }
+
+    @Override
+    public void incrementDivOperations() {
+        data.incrementDivOperations();
+    }
+
+    @Override
+    public void incrementIncorrectOperations() {
+        data.incrementIncorrectOperations();
+    }
+
+    @Override
+    public void sumResults(int result) {
+        data.addToSumOfResults(result);
     }
 }
