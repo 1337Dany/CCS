@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -16,8 +15,7 @@ import java.net.SocketException;
  */
 public class ClientManager implements Runnable {
     private final ClientManagerCallback clientManagerCallback;
-    private final int port;
-    private Socket clientSocket;
+    private final Socket clientSocket;
     private BufferedReader in;
     private PrintWriter out;
     private boolean isRunning = true;
@@ -25,13 +23,13 @@ public class ClientManager implements Runnable {
     /**
      * Constructs a ClientManager with the specified port and callback.
      *
-     * @param port the port number on which the server will listen for client connections
+     * @param clientSocket socket for client connection
      * @param clientManagerCallback the callback to handle client manager events
      * @throws IOException if an I/O error occurs when opening the socket
      */
-    public ClientManager(int port, ClientManagerCallback clientManagerCallback) throws IOException {
+    public ClientManager(Socket clientSocket, ClientManagerCallback clientManagerCallback) throws IOException {
+        this.clientSocket = clientSocket;
         this.clientManagerCallback = clientManagerCallback;
-        this.port = port;
     }
 
     /**
@@ -81,7 +79,7 @@ public class ClientManager implements Runnable {
                 }
 
                 // Showing received message
-                clientManagerCallback.onReceivedMessage(message);
+                //clientManagerCallback.onReceivedMessage(message);
 
                 // Store statistic data
                 clientManagerCallback.incrementComputedRequests();
@@ -101,11 +99,10 @@ public class ClientManager implements Runnable {
      * Sets up the input and output streams for communication with the client.
      */
     private void setupStreams() {
-        try (ServerSocket socket = new ServerSocket(port)) {
-            clientSocket = socket.accept();
+        try {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream(), true);
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

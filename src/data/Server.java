@@ -3,10 +3,7 @@ package data;
 import domain.ServerCallback;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -26,7 +23,7 @@ public class Server implements ClientManagerCallback {
     /**
      * Constructs a Server with the specified port and callback.
      *
-     * @param port the port number on which the server will listen for connections
+     * @param port     the port number on which the server will listen for connections
      * @param callback the callback to handle server events
      */
     public Server(int port, ServerCallback callback) {
@@ -48,7 +45,7 @@ public class Server implements ClientManagerCallback {
             callback.onConnectionError("Incorrect input");
             return;
         }
-        try {
+        try (ServerSocket socket = new ServerSocket(port)) {
             while (true) {
                 DatagramPacket packet = new DatagramPacket(BYTE_BUFFER, BYTE_BUFFER.length);
                 datagramSocket.receive(packet);
@@ -66,7 +63,8 @@ public class Server implements ClientManagerCallback {
                             senderPort
                     );
                     datagramSocket.send(acceptPacket);
-                    executorSevice.execute(new ClientManager(port, this));
+                    Socket clientSocket = socket.accept();
+                    executorSevice.execute(new ClientManager(clientSocket, this));
                 } else {
                     callback.onConnectionError("Incorrect input " + received);
                 }
