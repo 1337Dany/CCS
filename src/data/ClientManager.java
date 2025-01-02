@@ -8,6 +8,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
+/**
+ * The ClientManager class is responsible for managing client connections and handling
+ * client requests. It implements the Runnable interface to allow execution in a separate thread.
+ * The class performs various arithmetic operations based on client messages and updates
+ * statistics through the ClientManagerCallback interface.
+ */
 public class ClientManager implements Runnable {
     private final ClientManagerCallback clientManagerCallback;
     private final int port;
@@ -16,20 +22,31 @@ public class ClientManager implements Runnable {
     private PrintWriter out;
     private boolean isRunning = true;
 
+    /**
+     * Constructs a ClientManager with the specified port and callback.
+     *
+     * @param port the port number on which the server will listen for client connections
+     * @param clientManagerCallback the callback to handle client manager events
+     * @throws IOException if an I/O error occurs when opening the socket
+     */
     public ClientManager(int port, ClientManagerCallback clientManagerCallback) throws IOException {
         this.clientManagerCallback = clientManagerCallback;
         this.port = port;
     }
 
+    /**
+     * The run method is executed when the thread is started. It sets up the streams
+     * for communication with the client and processes client messages in a loop.
+     */
     @Override
     public void run() {
         setupStreams();
         while (isRunning) {
             try {
-                //  Reading message from client
+                // Reading message from client
                 String message = in.readLine();
 
-                //  Splitting message to get the operation and operands
+                // Splitting message to get the operation and operands
                 String[] receivedInfo = message.split(" ");
                 if (receivedInfo.length != 3) {
                     sendMessage("ERROR");
@@ -37,7 +54,7 @@ public class ClientManager implements Runnable {
                     continue;
                 }
 
-                //  Performing the operation
+                // Performing the operation
                 if (receivedInfo[0].equals(CalculationPrefixes.ADDITION.getPrefix())) {
                     int result = Integer.parseInt(receivedInfo[1]) + Integer.parseInt(receivedInfo[2]);
                     sendMessage(String.valueOf(result));
@@ -63,10 +80,10 @@ public class ClientManager implements Runnable {
                     clientManagerCallback.incrementIncorrectOperations();
                 }
 
-                //  Showing received message
+                // Showing received message
                 clientManagerCallback.onReceivedMessage(message);
 
-                //  Store statistic data
+                // Store statistic data
                 clientManagerCallback.incrementComputedRequests();
             } catch (SocketException e) {
                 clientManagerCallback.decrementConnectedClients();
@@ -74,12 +91,15 @@ public class ClientManager implements Runnable {
             } catch (NumberFormatException | ArithmeticException e) {
                 sendMessage("ERROR");
                 clientManagerCallback.incrementIncorrectOperations();
-            }catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    /**
+     * Sets up the input and output streams for communication with the client.
+     */
     private void setupStreams() {
         try (ServerSocket socket = new ServerSocket(port)) {
             clientSocket = socket.accept();
@@ -90,10 +110,18 @@ public class ClientManager implements Runnable {
         }
     }
 
+    /**
+     * Sends a message to the client.
+     *
+     * @param message the message to be sent to the client
+     */
     private void sendMessage(String message) {
         out.println(message);
     }
 
+    /**
+     * Closes the connection with the client and releases resources.
+     */
     private void closeConnection() {
         try {
             isRunning = false;

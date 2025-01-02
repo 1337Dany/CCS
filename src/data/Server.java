@@ -10,6 +10,11 @@ import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * The Server class handles incoming client connections and processes their requests.
+ * It uses a DatagramSocket to listen for client discovery messages and spawns ClientManager
+ * threads to handle individual client connections.
+ */
 public class Server implements ClientManagerCallback {
     private final Data data = new Data();
     private final ServerCallback callback;
@@ -18,6 +23,12 @@ public class Server implements ClientManagerCallback {
     private DatagramSocket datagramSocket;
     private static final ExecutorService executorSevice = Executors.newCachedThreadPool();
 
+    /**
+     * Constructs a Server with the specified port and callback.
+     *
+     * @param port the port number on which the server will listen for connections
+     * @param callback the callback to handle server events
+     */
     public Server(int port, ServerCallback callback) {
         this.callback = callback;
         this.port = port;
@@ -25,6 +36,11 @@ public class Server implements ClientManagerCallback {
         start();
     }
 
+    /**
+     * Starts the server to listen for client connections.
+     * It listens for "CCS DISCOVER" messages and responds with "CCS FOUND".
+     * Spawns a ClientManager thread for each client connection.
+     */
     public void start() {
         try {
             datagramSocket = new DatagramSocket(port);
@@ -60,6 +76,9 @@ public class Server implements ClientManagerCallback {
         }
     }
 
+    /**
+     * Starts a thread to report server statistics every 10 seconds.
+     */
     private void startShowDataThread() {
         executorSevice.execute(() -> {
             while (true) {
