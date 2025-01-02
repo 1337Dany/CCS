@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server implements ClientManagerCallback {
-    private static final Data data = new Data();
+    private final Data data = new Data();
     private final ServerCallback callback;
     private final int port;
     private static final byte[] BYTE_BUFFER = new byte[1024];
@@ -42,14 +42,15 @@ public class Server implements ClientManagerCallback {
                     data.incrementConnectedClients();
                     String acceptMessage = "CCS FOUND";
                     InetAddress address = packet.getAddress();
+                    int senderPort = packet.getPort();
                     DatagramPacket acceptPacket = new DatagramPacket(
                             acceptMessage.getBytes(),
                             acceptMessage.length(),
                             address,
-                            port
+                            senderPort
                     );
                     datagramSocket.send(acceptPacket);
-                    executorSevice.execute(new ClientManager(packet.getAddress().getHostAddress(), port, this));
+                    executorSevice.execute(new ClientManager(port, this));
                 } else {
                     callback.onConnectionError("Incorrect input " + received);
                 }

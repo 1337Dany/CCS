@@ -4,72 +4,87 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.DatagramPacket;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ClientManager implements Runnable {
     private final ClientManagerCallback clientManagerCallback;
     private final int port;
-    private final String ip;
-    private Socket socket;
+    private Socket clientSocket;
     private BufferedReader in;
     private PrintWriter out;
+    private boolean isRunning = true;
 
-    public ClientManager(String ip, int port, ClientManagerCallback clientManagerCallback) throws IOException {
+    public ClientManager(int port, ClientManagerCallback clientManagerCallback) throws IOException {
         this.clientManagerCallback = clientManagerCallback;
-        this.ip = ip;
         this.port = port;
-
-        setupConnection();
     }
 
     @Override
     public void run() {
         setupStreams();
-
-        while (true) {
+        while (isRunning) {
             try {
                 //  Reading message from client
                 String message = in.readLine();
 
                 //  Splitting message to get the operation and operands
                 String[] receivedInfo = message.split(" ");
+                if (receivedInfo.length != 3) {
+                    sendMessage("ERROR");
+                    clientManagerCallback.incrementIncorrectOperations();
+                    continue;
+                }
 
                 //  Performing the operation
                 if (receivedInfo[0].equals(CalculationPrefixes.ADDITION.getPrefix())) {
-                    sendMessage(String.valueOf(Integer.parseInt(receivedInfo[1]) + Integer.parseInt(receivedInfo[2])));
+                    int result = Integer.parseInt(receivedInfo[1]) + Integer.parseInt(receivedInfo[2]);
+                    sendMessage(String.valueOf(result));
+                    clientManagerCallback.incrementAddOperations();
+                    clientManagerCallback.sumResults(result);
                 } else if (receivedInfo[0].equals(CalculationPrefixes.SUBTRACTION.getPrefix())) {
-                    sendMessage(String.valueOf(Integer.parseInt(receivedInfo[1]) - Integer.parseInt(receivedInfo[2])));
+                    int result = Integer.parseInt(receivedInfo[1]) - Integer.parseInt(receivedInfo[2]);
+                    sendMessage(String.valueOf(result));
+                    clientManagerCallback.incrementSubOperations();
+                    clientManagerCallback.sumResults(result);
                 } else if (receivedInfo[0].equals(CalculationPrefixes.MULTIPLICATION.getPrefix())) {
-                    sendMessage(String.valueOf(Integer.parseInt(receivedInfo[1]) * Integer.parseInt(receivedInfo[2])));
+                    int result = Integer.parseInt(receivedInfo[1]) * Integer.parseInt(receivedInfo[2]);
+                    sendMessage(String.valueOf(result));
+                    clientManagerCallback.incrementMulOperations();
+                    clientManagerCallback.sumResults(result);
                 } else if (receivedInfo[0].equals(CalculationPrefixes.DIVISION.getPrefix())) {
-                    sendMessage(String.valueOf(Integer.parseInt(receivedInfo[1]) / Integer.parseInt(receivedInfo[2])));
+                    int result = Integer.parseInt(receivedInfo[1]) / Integer.parseInt(receivedInfo[2]);
+                    sendMessage(String.valueOf(result));
+                    clientManagerCallback.incrementDivOperations();
+                    clientManagerCallback.sumResults(result);
                 } else {
                     sendMessage("ERROR");
+                    clientManagerCallback.incrementIncorrectOperations();
                 }
 
                 //  Showing received message
                 clientManagerCallback.onReceivedMessage(message);
 
                 //  Store statistic data
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            } catch (NumberFormatException e) {
+                clientManagerCallback.incrementComputedRequests();
+            } catch (SocketException e) {
+                clientManagerCallback.decrementConnectedClients();
+                closeConnection();
+            } catch (NumberFormatException | ArithmeticException e) {
                 sendMessage("ERROR");
+                clientManagerCallback.incrementIncorrectOperations();
+            }catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    private void setupConnection() throws IOException {
-        socket = new Socket(ip, port);
-    }
-
     private void setupStreams() {
-        try {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+        try (ServerSocket socket = new ServerSocket(port)) {
+            clientSocket = socket.accept();
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -77,5 +92,16 @@ public class ClientManager implements Runnable {
 
     private void sendMessage(String message) {
         out.println(message);
+    }
+
+    private void closeConnection() {
+        try {
+            isRunning = false;
+            clientSocket.close();
+            in.close();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

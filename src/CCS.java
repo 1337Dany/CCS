@@ -12,8 +12,7 @@ public class CCS {
     }
 
     public static void main(String[] args) {
-        //new CCS(Integer.parseInt(args[0]));
-        new CCS(12345);
+        new CCS(Integer.parseInt(args[0]));
     }
 
 }
