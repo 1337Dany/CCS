@@ -1,7 +1,13 @@
 package domain;
 
-import data.Server;
+import data.Data;
+import data.datasource.TCPServer;
+import data.datasource.UDPServer;
+import ui.ConsoleView;
 import ui.View;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * The CCSPresenter class acts as a presenter in the Model-View-Presenter (MVP) pattern.
@@ -9,7 +15,9 @@ import ui.View;
  * It implements the ServerCallback interface to receive server events and update the view accordingly.
  */
 public class CCSPresenter implements ServerCallback {
-    private static View consoleView;
+    private static final ExecutorService serverExecutor = Executors.newCachedThreadPool();
+    private static ConsoleView consoleView;
+    private final Data statistics = new Data();
 
     /**
      * Constructs a CCSPresenter with the specified port and view.
@@ -17,7 +25,7 @@ public class CCSPresenter implements ServerCallback {
      * @param port the port number on which the server will listen for connections
      * @param view the view that will display messages and statistics
      */
-    public CCSPresenter(int port, View view) {
+    public CCSPresenter(int port, ConsoleView view) {
         consoleView = view;
         configure(port);
     }
@@ -28,7 +36,23 @@ public class CCSPresenter implements ServerCallback {
      * @param port the port number on which the server will listen for connections
      */
     private void configure(int port) {
-        Server server = new Server(port, this);
+        serverExecutor.execute(() -> new UDPServer(port, this));
+        serverExecutor.execute(() -> new TCPServer(port, this, statistics));
+        serverExecutor.execute(this::startShowDataThread);
+    }
+
+    /**
+     * Starts a thread to report server statistics every 10 seconds.
+     */
+    private void startShowDataThread() {
+        while (true) {
+            try {
+                Thread.sleep(10000);
+                statisticsReport(statistics.getData());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
@@ -59,7 +83,6 @@ public class CCSPresenter implements ServerCallback {
      *
      * @param message the statistics report received from the server
      */
-    @Override
     public void statisticsReport(String message) {
         consoleView.statisticsReprot(message);
     }

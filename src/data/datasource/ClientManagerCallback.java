@@ -1,4 +1,4 @@
-package data;
+package data.datasource;
 
 /**
  * The ClientManagerCallback interface defines the methods that must be implemented
@@ -7,14 +7,6 @@ package data;
  * updating client connection counts, and tracking different types of operations.
  */
 public interface ClientManagerCallback {
-
-    /**
-     * Called when a message is received from a client.
-     *
-     * @param message the message received from the client
-     */
-    void onReceivedMessage(String message);
-
     /**
      * Decrements the count of connected clients by one.
      */

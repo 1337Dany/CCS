@@ -1,4 +1,6 @@
-package data;
+package data.datasource;
+
+import data.CalculationPrefixes;
 
 import java.io.BufferedReader;
 import java.io.IOException;
