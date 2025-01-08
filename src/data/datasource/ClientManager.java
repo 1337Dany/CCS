@@ -85,7 +85,7 @@ public class ClientManager implements Runnable {
 
                 // Store statistic data
                 clientManagerCallback.incrementComputedRequests();
-            } catch (SocketException e) {
+            } catch (SocketException | NullPointerException e) {
                 clientManagerCallback.decrementConnectedClients();
                 closeConnection();
             } catch (NumberFormatException | ArithmeticException e) {

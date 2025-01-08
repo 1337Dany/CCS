@@ -17,56 +17,56 @@ public class Data {
     /**
      * Increments the count of connected clients by one.
      */
-    public void incrementConnectedClients() {
+    public synchronized void incrementConnectedClients() {
         connectedClients++;
     }
 
     /**
      * Decrements the count of connected clients by one.
      */
-    public void decrementConnectedClients() {
+    public synchronized void decrementConnectedClients() {
         connectedClients--;
     }
 
     /**
      * Increments the count of computed requests by one.
      */
-    public void incrementComputedRequests() {
+    public synchronized void incrementComputedRequests() {
         computedRequests++;
     }
 
     /**
      * Increments the count of addition operations by one.
      */
-    public void incrementAddOperations() {
+    public synchronized void incrementAddOperations() {
         addOperations++;
     }
 
     /**
      * Increments the count of subtraction operations by one.
      */
-    public void incrementSubOperations() {
+    public synchronized void incrementSubOperations() {
         subOperations++;
     }
 
     /**
      * Increments the count of multiplication operations by one.
      */
-    public void incrementMulOperations() {
+    public synchronized void incrementMulOperations() {
         mulOperations++;
     }
 
     /**
      * Increments the count of division operations by one.
      */
-    public void incrementDivOperations() {
+    public synchronized void incrementDivOperations() {
         divOperations++;
     }
 
     /**
      * Increments the count of incorrect operations by one.
      */
-    public void incrementIncorrectOperations() {
+    public synchronized void incrementIncorrectOperations() {
         incorrectOperations++;
     }
 
@@ -75,7 +75,7 @@ public class Data {
      *
      * @param value the value to be added to the sum of results
      */
-    public void addToSumOfResults(int value) {
+    public synchronized void addToSumOfResults(int value) {
         sumOfResults += value;
     }
 
@@ -84,7 +84,7 @@ public class Data {
      *
      * @return a string representation of the current statistics
      */
-    public String getData() {
+    public synchronized String getData() {
         return "The number of newly connected clients:             " + connectedClients + "\n" +
                 "The number of computed requests:                   " + computedRequests + "\n" +
                 "The numbers of particular requested operations:" + "\n" +
