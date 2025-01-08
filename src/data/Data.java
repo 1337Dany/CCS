@@ -1,73 +1,94 @@
 package data;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * The Data class is responsible for maintaining and updating various statistics related to client connections and operations.
  * It provides methods to increment and decrement these statistics, as well as a method to retrieve a formatted string of the current data.
  */
 public class Data {
-    private static int connectedClients = 0;
-    private static int computedRequests = 0;
-    private static int addOperations = 0;
-    private static int subOperations = 0;
-    private static int mulOperations = 0;
-    private static int divOperations = 0;
-    private static int incorrectOperations = 0;
-    private static int sumOfResults = 0;
+    // Overall statistics
+    private static final AtomicLong connectedClients = new AtomicLong(0);
+    private static final AtomicLong computedRequests = new AtomicLong(0);
+    private static final AtomicLong addOperations = new AtomicLong(0);
+    private static final AtomicLong subOperations = new AtomicLong(0);
+    private static final AtomicLong mulOperations = new AtomicLong(0);
+    private static final AtomicLong divOperations = new AtomicLong(0);
+    private static final AtomicLong incorrectOperations = new AtomicLong(0);
+    private static final AtomicLong sumOfResults = new AtomicLong(0);
+
+    // Statistics for last 10 seconds
+    private static final AtomicLong connectedClientsTmp = new AtomicLong(0);
+    private static final AtomicLong computedRequestsTmp = new AtomicLong(0);
+    private static final AtomicLong addOperationsTmp = new AtomicLong(0);
+    private static final AtomicLong subOperationsTmp = new AtomicLong(0);
+    private static final AtomicLong mulOperationsTmp = new AtomicLong(0);
+    private static final AtomicLong divOperationsTmp = new AtomicLong(0);
+    private static final AtomicLong incorrectOperationsTmp = new AtomicLong(0);
+    private static final AtomicLong sumOfResultsTmp = new AtomicLong(0);
 
     /**
      * Increments the count of connected clients by one.
      */
-    public synchronized void incrementConnectedClients() {
-        connectedClients++;
+    public void incrementConnectedClients() {
+        connectedClients.incrementAndGet();
+        connectedClientsTmp.incrementAndGet();
     }
 
     /**
      * Decrements the count of connected clients by one.
      */
-    public synchronized void decrementConnectedClients() {
-        connectedClients--;
+    public void decrementConnectedClients() {
+        connectedClients.decrementAndGet();
+        connectedClientsTmp.decrementAndGet();
     }
 
     /**
      * Increments the count of computed requests by one.
      */
-    public synchronized void incrementComputedRequests() {
-        computedRequests++;
+    public void incrementComputedRequests() {
+        computedRequests.incrementAndGet();
+        computedRequestsTmp.incrementAndGet();
     }
 
     /**
      * Increments the count of addition operations by one.
      */
-    public synchronized void incrementAddOperations() {
-        addOperations++;
+    public void incrementAddOperations() {
+        addOperations.incrementAndGet();
+        addOperationsTmp.incrementAndGet();
     }
 
     /**
      * Increments the count of subtraction operations by one.
      */
-    public synchronized void incrementSubOperations() {
-        subOperations++;
+    public void incrementSubOperations() {
+        subOperations.incrementAndGet();
+        subOperationsTmp.incrementAndGet();
     }
 
     /**
      * Increments the count of multiplication operations by one.
      */
-    public synchronized void incrementMulOperations() {
-        mulOperations++;
+    public void incrementMulOperations() {
+        mulOperations.incrementAndGet();
+        mulOperationsTmp.incrementAndGet();
     }
 
     /**
      * Increments the count of division operations by one.
      */
-    public synchronized void incrementDivOperations() {
-        divOperations++;
+    public void incrementDivOperations() {
+        divOperations.incrementAndGet();
+        divOperationsTmp.incrementAndGet();
     }
 
     /**
      * Increments the count of incorrect operations by one.
      */
-    public synchronized void incrementIncorrectOperations() {
-        incorrectOperations++;
+    public void incrementIncorrectOperations() {
+        incorrectOperations.incrementAndGet();
+        incorrectOperationsTmp.incrementAndGet();
     }
 
     /**
@@ -75,8 +96,20 @@ public class Data {
      *
      * @param value the value to be added to the sum of results
      */
-    public synchronized void addToSumOfResults(int value) {
-        sumOfResults += value;
+    public void addToSumOfResults(int value) {
+        sumOfResults.addAndGet(value);
+        sumOfResultsTmp.addAndGet(value);
+    }
+
+    public void updateTmpData() {
+        connectedClientsTmp.set(0);
+        computedRequestsTmp.set(0);
+        addOperationsTmp.set(0);
+        subOperationsTmp.set(0);
+        mulOperationsTmp.set(0);
+        divOperationsTmp.set(0);
+        incorrectOperationsTmp.set(0);
+        sumOfResultsTmp.set(0);
     }
 
     /**
@@ -84,15 +117,26 @@ public class Data {
      *
      * @return a string representation of the current statistics
      */
-    public synchronized String getData() {
-        return "The number of newly connected clients:             " + connectedClients + "\n" +
-                "The number of computed requests:                   " + computedRequests + "\n" +
+    public String getData() {
+        return "------ Overall Statistics ------\n" +
+                "The number of newly connected clients:             " + connectedClients.get() + "\n" +
+                "The number of computed requests:                   " + computedRequests.get() + "\n" +
                 "The numbers of particular requested operations:" + "\n" +
-                "Add operations:                                    " + addOperations + "\n" +
-                "Sub operations:                                    " + subOperations + "\n" +
-                "Mul operations:                                    " + mulOperations + "\n" +
-                "Div operations:                                    " + divOperations + "\n" +
-                "The number of incorrect operations:                " + incorrectOperations + "\n" +
-                "The sum of computed values:                        " + sumOfResults;
+                "Add operations:                                    " + addOperations.get() + "\n" +
+                "Sub operations:                                    " + subOperations.get() + "\n" +
+                "Mul operations:                                    " + mulOperations.get() + "\n" +
+                "Div operations:                                    " + divOperations.get() + "\n" +
+                "The number of incorrect operations:                " + incorrectOperations.get() + "\n" +
+                "The sum of computed values:                        " + sumOfResults.get() + "\n" +
+                "------ Statistics for the last 10 seconds ------\n" +
+                "The number of newly connected clients:             " + connectedClientsTmp.get() + "\n" +
+                "The number of computed requests:                   " + computedRequestsTmp.get() + "\n" +
+                "The numbers of particular requested operations:" + "\n" +
+                "Add operations:                                    " + addOperationsTmp.get() + "\n" +
+                "Sub operations:                                    " + subOperationsTmp.get() + "\n" +
+                "Mul operations:                                    " + mulOperationsTmp.get() + "\n" +
+                "Div operations:                                    " + divOperationsTmp.get() + "\n" +
+                "The number of incorrect operations:                " + incorrectOperationsTmp.get() + "\n" +
+                "The sum of computed values:                        " + sumOfResultsTmp.get();
     }
 }

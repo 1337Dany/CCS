@@ -49,6 +49,7 @@ public class CCSPresenter implements ServerCallback {
             try {
                 Thread.sleep(10000);
                 statisticsReport(statistics.getData());
+                statistics.updateTmpData();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
