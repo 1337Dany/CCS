@@ -101,6 +101,9 @@ public class Data {
         sumOfResultsTmp.addAndGet(value);
     }
 
+    /**
+     * Resets the temporary statistics for the last 10 seconds.
+     */
     public void updateTmpData() {
         connectedClientsTmp.set(0);
         computedRequestsTmp.set(0);
@@ -113,7 +116,7 @@ public class Data {
     }
 
     /**
-     * Returns a formatted string containing the current statistics.
+     * Returns a formatted string containing the statistics.
      *
      * @return a string representation of the current statistics
      */

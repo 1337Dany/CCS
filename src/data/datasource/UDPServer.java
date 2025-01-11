@@ -1,15 +1,13 @@
 package data.datasource;
 
-import data.Data;
 import domain.ServerCallback;
 
 import java.io.IOException;
 import java.net.*;
 
 /**
- * The Server class handles incoming client connections and processes their requests.
- * It uses a DatagramSocket to listen for client discovery messages and spawns ClientManager
- * threads to handle individual client connections.
+ * The UDPServer class handles incoming client connections and processes their requests using UDP.
+ * It listens for client discovery messages and responds accordingly.
  */
 public class UDPServer {
     private final ServerCallback callback;
@@ -17,7 +15,7 @@ public class UDPServer {
     private static final byte[] BYTE_BUFFER = new byte[1024];
 
     /**
-     * Constructs a Server with the specified port and callback.
+     * Constructs a UDPServer with the specified port and callback.
      *
      * @param port           the port number on which the server will listen for connections
      * @param serverCallback the callback to handle server events
@@ -31,7 +29,7 @@ public class UDPServer {
     /**
      * Starts the server to listen for client connections.
      * It listens for "CCS DISCOVER" messages and responds with "CCS FOUND".
-     * Spawns a ClientManager thread for each client connection.
+     * If an incorrect message is received, it triggers the callback with an error message.
      */
     public void start() {
         try (DatagramSocket datagramSocket = new DatagramSocket(port)) {
@@ -59,5 +57,4 @@ public class UDPServer {
             e.printStackTrace();
         }
     }
-
 }

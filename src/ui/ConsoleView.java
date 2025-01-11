@@ -18,5 +18,10 @@ public interface ConsoleView {
      */
     void printErrorMessage(String str);
 
+    /**
+     * Prints a statistics report to the console.
+     *
+     * @param str the statistics report to print
+     */
     void statisticsReprot(String str);
 }

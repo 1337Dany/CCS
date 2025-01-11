@@ -23,9 +23,9 @@ public class ClientManager implements Runnable {
     private boolean isRunning = true;
 
     /**
-     * Constructs a ClientManager with the specified port and callback.
+     * Constructs a ClientManager with the specified client socket and callback.
      *
-     * @param clientSocket socket for client connection
+     * @param clientSocket the socket for client connection
      * @param clientManagerCallback the callback to handle client manager events
      * @throws IOException if an I/O error occurs when opening the socket
      */

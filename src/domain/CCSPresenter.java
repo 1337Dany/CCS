@@ -4,7 +4,6 @@ import data.Data;
 import data.datasource.TCPServer;
 import data.datasource.UDPServer;
 import ui.ConsoleView;
-import ui.View;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -64,7 +63,7 @@ public class CCSPresenter implements ServerCallback {
      */
     @Override
     public void onConnectionMessage(String message) {
-        consoleView.printErrorMessage(message);
+        consoleView.printMessage(message);
     }
 
     /**
