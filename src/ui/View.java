@@ -25,6 +25,11 @@ public class View implements ConsoleView {
         System.err.println(str);
     }
 
+    /**
+     * Prints all statistic data to the console.
+     *
+     * @param str built string with all statistic data
+     */
     @Override
     public void statisticsReprot(String str) {
         System.out.println(str);

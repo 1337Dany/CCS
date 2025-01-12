@@ -78,6 +78,7 @@ public class ClientManager implements Runnable {
                 } else {
                     sendMessage("ERROR");
                     clientManagerCallback.incrementIncorrectOperations();
+                    continue;
                 }
 
                 // Showing received message
